@@ -314,7 +314,7 @@ static yyconst int yy_ec[256] =
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    4,    1,    5,    1,    1,    1,    1,    1,    1,
-        1,    6,    7,    1,    7,    8,    1,    9,   10,   10,
+        1,    6,    7,    1,    7,    8,    7,    9,   10,   10,
        10,   10,   10,   10,   10,   10,   10,    1,    7,    1,
         7,    1,    1,    1,   11,   11,   11,   11,   11,   11,
        11,   11,   11,   11,   11,   11,   11,   11,   11,   11,
@@ -369,7 +369,7 @@ static yyconst short int yy_def[53] =
 
 static yyconst short int yy_nxt[121] =
     {   0,
-        4,    5,    6,    5,    7,    4,    8,    4,    9,   10,
+        4,    5,    6,    5,    7,    8,    8,    4,    9,   10,
        11,   11,   12,   13,   11,   11,   14,   11,   11,   11,
        11,   15,   11,   16,   16,   16,   16,   16,   16,   20,
        21,   22,   23,   24,   24,   16,   16,   16,   31,   32,
@@ -674,7 +674,7 @@ case 1:
 YY_RULE_SETUP
 #line 15 ".\\compiler.l"
 {
-                                printf("INT ");
+                                // printf("INT ");
                                 return type_int;
                             }
 	YY_BREAK
@@ -682,7 +682,7 @@ case 2:
 YY_RULE_SETUP
 #line 20 ".\\compiler.l"
 {
-                                printf("FLOAT ");
+                                // printf("FLOAT ");
                                 return type_float;
                             }
 	YY_BREAK
@@ -690,7 +690,7 @@ case 3:
 YY_RULE_SETUP
 #line 25 ".\\compiler.l"
 {
-                                printf("CHAR ");
+                                // printf("CHAR ");
                                 return type_char;
                             }
 	YY_BREAK
@@ -698,7 +698,7 @@ case 4:
 YY_RULE_SETUP
 #line 30 ".\\compiler.l"
 {   
-                                printf("STRING ");
+                                // printf("STRING ");
                                 return type_string;
                             }
 	YY_BREAK
@@ -706,7 +706,7 @@ case 5:
 YY_RULE_SETUP
 #line 35 ".\\compiler.l"
 {
-                                printf("stringVar %s ", yytext);
+                                // printf("stringVar %s ", yytext);
                                 yylval.var_name = strdup(yytext);
                                 return VARIABLE;
                             }
@@ -734,7 +734,7 @@ case 8:
 YY_RULE_SETUP
 #line 50 ".\\compiler.l"
 {
-                                printf("integer ");
+                                // printf("integer ");
                                 yylval.iValue = atoi(yytext);
                                 return INTEGER;
                             }
@@ -743,7 +743,7 @@ case 9:
 YY_RULE_SETUP
 #line 56 ".\\compiler.l"
 {
-                                printf("floating ");
+                                // printf("floating ");
                                 yylval.fValue = atof(yytext);
                                 return FLOAT;
                             }
@@ -755,14 +755,14 @@ YY_RULE_SETUP
                                 if(yyleng == 3)
                                 {
                                     yylval.cValue = yytext[1];
-                                    printf("found %d '%c' ", yyleng, yylval.cValue);
+                                    // printf("found %d '%c' ", yyleng, yylval.cValue);
                                     return CHAR;
                                 }
                                 else
                                 {
                                     yylval.sValue = strdup(yytext+1);
                                     yylval.sValue[yyleng-2] = 0;
-                                    printf("found %d '%s' ", yyleng, yylval.sValue);
+                                    // printf("found %d '%s' ", yyleng, yylval.sValue);
                                     return STRING;
                                 }
                             }
@@ -771,7 +771,7 @@ case 11:
 YY_RULE_SETUP
 #line 78 ".\\compiler.l"
 { 
-                                printf("%c ", *yytext);
+                                // printf("%c ", *yytext);
                                 return *yytext; 
                             }
 	YY_BREAK

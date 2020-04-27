@@ -13,48 +13,48 @@
 %%
 
 int                         {
-                                printf("INT ");
+                                // printf("INT ");
                                 return type_int;
                             }
 
 float                       {
-                                printf("FLOAT ");
+                                // printf("FLOAT ");
                                 return type_float;
                             }
 
 char                        {
-                                printf("CHAR ");
+                                // printf("CHAR ");
                                 return type_char;
                             }
 
 char[ ]*\*|string           {   
-                                printf("STRING ");
+                                // printf("STRING ");
                                 return type_string;
                             }
 
 [a-zA-Z][0-9a-zA-Z]*        {
-                                printf("stringVar %s ", yytext);
+                                // printf("stringVar %s ", yytext);
                                 yylval.var_name = strdup(yytext);
                                 return VARIABLE;
                             }
 
-[0]+                         {
+[0]+                        {
                                 yylval.iValue = 0;
                                 return INTEGER;
                             }
-[0]+.[0]+$             {
+[0]+.[0]+$                  {
                                 yylval.iValue = 0;
                                 return INTEGER;
                             }
 
-[1-9][0-9]*                {
-                                printf("integer ");
+[1-9][0-9]*                 {
+                                // printf("integer ");
                                 yylval.iValue = atoi(yytext);
                                 return INTEGER;
                             }
 
 [0-9]+[.][0-9]*             {
-                                printf("floating ");
+                                // printf("floating ");
                                 yylval.fValue = atof(yytext);
                                 return FLOAT;
                             }
@@ -63,20 +63,20 @@ char[ ]*\*|string           {
                                 if(yyleng == 3)
                                 {
                                     yylval.cValue = yytext[1];
-                                    printf("found %d '%c' ", yyleng, yylval.cValue);
+                                    // printf("found %d '%c' ", yyleng, yylval.cValue);
                                     return CHAR;
                                 }
                                 else
                                 {
                                     yylval.sValue = strdup(yytext+1);
                                     yylval.sValue[yyleng-2] = 0;
-                                    printf("found %d '%s' ", yyleng, yylval.sValue);
+                                    // printf("found %d '%s' ", yyleng, yylval.sValue);
                                     return STRING;
                                 }
                             }
 
-[-+=;]                      { 
-                                printf("%c ", *yytext);
+[-+\*/=;]                   { 
+                                // printf("%c ", *yytext);
                                 return *yytext; 
                             }
 

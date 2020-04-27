@@ -13,10 +13,11 @@ bool chech_type(char* var_name, nodeType* p, typeEnum var_type);
 bool declaration(char* name, typeEnum type, int init);
 void assignment(char* lhs, nodeType* rhs);
 void freeNode(nodeType *p);
-int ex(nodeType *p);
+int ex(nodeType *p, int s_cnt);
 int yylex(void);
 
 int err = 0;
+int statements = 1;
 void yyerror(char *s);
 int sym[26];                    /* symbol table */
 node_t *head = NULL;            /* symbol table */
@@ -43,11 +44,7 @@ extern FILE *yyin;
 %token <var_name> VARIABLE
 // type reserved words
 %token type_int type_float type_char type_string
-%token WHILE IF PRINT
-%nonassoc IFX
-%nonassoc ELSE
 
-%left GE LE EQ NE '>' '<'
 %left '+' '-'
 %left '*' '/'
 %nonassoc UMINUS
@@ -57,40 +54,31 @@ extern FILE *yyin;
 %%
 
 program:
-        function                { printf("TERMINATE"); }
+        function                {  }
         ;
 
 function:
-          function stmt         { freeNode($2); err=0;}                                         
+          function stmt         {   
+                                    if(err==0)
+                                        ex($2, statements);
+                                    freeNode($2);
+                                    err=0;
+                                    statements++;
+                                }                                         
         | /* NULL */
         ;
 
 stmt:
           ';'                               { $$ = opr(';', 2, NULL, NULL); }
-        | expr ';'                          { 
-                                               $$ = $1;
-                                            }
-        | PRINT expr ';'                    { $$ = opr(PRINT, 1, $2); }
+        | expr ';'                          {$$ = $1;}
         
-        | type_int VARIABLE ';'             { 
-                                               declaration($2, int_val, 0); 
-                                               $$ = id($2);
-                                            }
+        | type_int VARIABLE ';'             { declaration($2, int_val, 0); $$ = id($2); }
         
-        | type_float VARIABLE ';'           { 
-                                               declaration($2, float_val, 0);
-                                               $$ = id($2);
-                                            }
+        | type_float VARIABLE ';'           { declaration($2, float_val, 0); $$ = id($2); }
         
-        | type_char VARIABLE ';'            { 
-                                               declaration($2, char_val, 0);
-                                               $$ = id($2);
-                                            }
+        | type_char VARIABLE ';'            { declaration($2, char_val, 0); $$ = id($2); }
         
-        | type_string VARIABLE ';'          { 
-                                               declaration($2, string_val, 0);
-                                               $$ = id($2);
-                                            }
+        | type_string VARIABLE ';'          { declaration($2, string_val, 0); $$ = id($2); }
         
         | type_int VARIABLE '=' expr ';'    { $$ = opr(int_val, '=', 2, id($2), $4);}
         
@@ -106,6 +94,8 @@ stmt:
         | VARIABLE '=' expr ';'             { $$ = opr(-1, '=', 2, id($1), $3);}
     
         | '{' stmt_list '}'                 { $$ = $2; }
+
+        | error ';'                         { yyerror("ERROR!!!");  err=1; yyerrok; $$ = NULL;}
         ;
 
 stmt_list:
@@ -148,12 +138,12 @@ expr:
                                 }
         | VARIABLE              { $$ = id($1); }
 
-        | '-' expr %prec UMINUS {
-                                    $$ = opr(-1, UMINUS, 1, $2);
-                                }
+        | '-' expr %prec UMINUS { $$ = opr(-1, UMINUS, 1, $2);}
 
         | expr '+' expr         { $$ = opr(-1, '+', 2, $1, $3); }
         | expr '-' expr         { $$ = opr(-1, '-', 2, $1, $3); }
+        | expr '*' expr         { $$ = opr(-1, '*', 2, $1, $3); }
+        | expr '/' expr         { $$ = opr(-1, '/', 2, $1, $3); }
         | '(' expr ')'          { $$ = $2; }
         ;
 
@@ -269,7 +259,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
 
     if(nops == 2)
     {
-        if (oper == '+' || oper == '-')
+        if (oper == '+' || oper == '-' || oper == '*' || oper == '/')
         {
             typeEnum operand1_type = get_operand_type(p->opr.op[0], oper);
             typeEnum operand2_type = get_operand_type(p->opr.op[1], oper);
@@ -282,7 +272,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
 
             if(operand1_type != operand2_type)
             {
-                yyerror("+ or - Two operands type mismatch");
+                yyerror("operation with two type-mismatched operands");
                 err = 1;
             }
             if(operand1_type == char_val || operand1_type == string_val ||
@@ -298,6 +288,8 @@ nodeType *opr(int rule, int oper, int nops, ...) {
             typeEnum LHS_type;
             typeEnum RHS_type;
             // LHS
+
+            // Initialization
             if(rule >= 0)
             {
                 if (var != NULL)
@@ -365,22 +357,6 @@ nodeType *opr(int rule, int oper, int nops, ...) {
     return p;
 }
 
-bool chech_type(char* var_name, nodeType* p, typeEnum var_type)
-{
-    if(p->type == typeCon)
-    {
-        if(var_type != p->con.type)
-            return false;
-    }
-    else if(p->type == typeId)
-    {
-        node_t * var = search(p->id.var_name);
-        if(var_type != var->type)
-            return false;
-    }
-    return true;
-}
-
 bool declaration(char* name, typeEnum type, int init)
 {
     node_t * var = search(name);
@@ -399,7 +375,7 @@ bool declaration(char* name, typeEnum type, int init)
         if (err == 0)
         {
             push(node);
-            printf("\nvariable %s added to the table\n", node->name);
+            // printf("\nvariable %s added to the table\n", node->name);
         }
 
         return true;
@@ -412,102 +388,15 @@ bool declaration(char* name, typeEnum type, int init)
     }
 }
 
-void assignment(char* lhs, nodeType* rhs)
-{
-    node_t * var = search(lhs);
-    if(var == NULL)
-    {
-        printf("%s ", lhs);
-        yyerror("wasn't declared in this scope");
-    }
-    else if(rhs->type == typeCon)
-    {
-        if(var->type == rhs->con.type)
-        {
-            var->initial = 1;
-            switch (var->type)
-            {
-                case int_val:
-                    var->iValue = rhs->con.con_int;
-                    break;
-                case float_val:
-                    var->fValue = rhs->con.con_float;
-                    break;
-                case char_val:
-                    var->cValue = rhs->con.con_char;
-                    break;
-                case string_val:
-                    var->sValue = strdup(rhs->con.con_string);
-                    break;
-                default:
-                    break;
-            }
-        } 
-        else
-        {
-            yyerror("constant Type mismatch");
-            // printf("\n");
-        }
-    }
-    else if(rhs->type == typeId)
-    {
-        node_t * rhs_var = search(rhs->id.var_name);
-        if(rhs_var == NULL)
-        {
-            printf("%s ", rhs->id.var_name);
-            yyerror("wasn't declared in this scope\n");
-        }
-        else
-        {
-            // printf("HERE ELSE\n");
-            if(var->type == rhs_var->type)
-            {
-                if(rhs_var->initial == 1)
-                {    
-                    var->initial = 1;
-                    switch (var->type)
-                    {
-                        case int_val:
-                            var->iValue = rhs_var->iValue;
-                            break;
-                        case float_val:
-                            var->fValue = rhs_var->fValue;
-                            break;
-                        case char_val:
-                            var->cValue = rhs_var->cValue;
-                            break;
-                        case string_val:
-                            var->sValue = strdup(rhs_var->sValue);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    printf("%s ", rhs_var->name);
-                    yyerror("wasn't initialized");
-                }
-            }
-            else
-            {
-                yyerror("Variable type mismatch");
-            }
-        }
-    }
-
-    print_list(head);
-}
-
 void freeNode(nodeType *p) {
     int i;
-    // printf("START OF FREENODE\n");
+
     if (!p) return;
     if (p->type == typeOpr) {
         for (i = 0; i < p->opr.nops; i++)
             freeNode(p->opr.op[i]);
     }
-    // printf("END OF FREENODE\n");
+
     free (p);
 }
 
@@ -519,12 +408,15 @@ int main(int argc, char* argv[]) {
     strcpy(filename, argv[1]);
     if (argc == 2) {
         yyin = fopen(argv[1], "r");
-        printf("\nfilename is %s\n", filename);
+        printf("\nfilename is %s\n\n", filename);
     }
     else {
         printf("No files - Exit\n");
         exit(1);
     }
+    // FILE *fp;
+    // fp = freopen("quads.txt", "w", stdout);
+    // fclose(fp);
 
     // parse through the input until there is no more:
     do {

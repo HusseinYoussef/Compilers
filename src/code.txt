@@ -1,4 +1,2 @@
-int x = 4;
-char y = "x";
-int z = x;
-string f = "wdwdw";
+int x = 5;
+int y = -5*-x;

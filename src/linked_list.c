@@ -47,25 +47,26 @@ void print_list(node_t * head)
 
     while (current != NULL)
     {
-        printf("**************\n");
+        printf("==================================================\n");
+        printf("Variable\t\tType\t\tValue\n");
         switch (current->type)
         {
         case int_val:
-            printf("%s\tint\n", current->name);
+            printf("%-15s\t\tint\t\t%d\n", current->name, current->iValue);
             break;
         case float_val:
-            printf("%s\tfloat\n", current->name);
+            printf("%-15s\t\tfloat\t\t%f\n", current->name, current->fValue);
             break;
         case char_val:
-            printf("%s\tchar\n", current->name);
+            printf("%-15s\t\tchar\t\t%c\n", current->name, current->cValue);
             break;
         case string_val:
-            printf("%s\tstring\n", current->name);
+            printf("%-15s\t\tstring\t\t%s\n", current->name, current->sValue);
             break;
         default:
             break;
         }
-        printf("**************\n");
+        printf("==================================================\n");
 
         current = current->next;
     }

@@ -48,16 +48,7 @@
      type_float = 264,
      type_char = 265,
      type_string = 266,
-     WHILE = 267,
-     IF = 268,
-     PRINT = 269,
-     IFX = 270,
-     ELSE = 271,
-     NE = 272,
-     EQ = 273,
-     LE = 274,
-     GE = 275,
-     UMINUS = 276
+     UMINUS = 267
    };
 #endif
 
@@ -68,7 +59,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 29 ".\\compiler.y"
+#line 30 ".\\compiler.y"
 
     int iValue;                     /* integer value */
     float fValue;                   /* float value */
@@ -81,7 +72,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 85 "compiler.tab.h"
+#line 76 "compiler.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
