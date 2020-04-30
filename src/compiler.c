@@ -52,7 +52,7 @@ char* quad(nodeType *p)
             char* RHS = strdup(quad(p->opr.op[1]));
 
             //op arg1 arg2 result
-            printf("%c\t%s\t%s\tT%d\n", p->opr.oper, LHS, RHS, t);
+            printf("%c\t%-15s\t\t%s\t\tT%d\n", p->opr.oper, LHS, RHS, t);
             
             char* str;
             (str = malloc(sizeof(char)*2));
@@ -66,8 +66,8 @@ char* quad(nodeType *p)
         {
             char* LHS = strdup(quad(p->opr.op[0]));
             
-            //= RHS NULL Var
-            printf("MINUS\t%s\tNULL\tT%d\n", LHS, t);
+            //- LHS NULL Var
+            printf("MINUS\t%-15s\t\tNULL\t\tT%d\n", LHS, t);
             char* str;
             (str = malloc(sizeof(char)*2));
             sprintf(str, "T%d", t++);
@@ -81,7 +81,7 @@ char* quad(nodeType *p)
             char* RHS = strdup(quad(p->opr.op[1]));
 
             //= RHS NULL Var
-            printf("=\t%s\tNULL\t%s\n", RHS, LHS);
+            printf("=\t%-15s\t\tNULL\t\t%s\n", RHS, LHS);
             
             free (LHS);
             free (RHS);
@@ -166,7 +166,7 @@ char* update_table(nodeType *p)
             char* str;
             (str = malloc(sizeof(char)*8));
             // int
-            if(atoi(LHS) == atof(LHS))
+            if(atoi(LHS) == atof(LHS) && atoi(RHS) == atof(RHS))
             {
                 int result = 0;
                 if(p->opr.oper == '+')
@@ -250,7 +250,7 @@ char* update_table(nodeType *p)
     return "";
 }
 
-int ex(nodeType *p, int s_cnt) {
+int ex(nodeType *p, int s_cnt, int update) {
     
     if (!p) return 0;
 
@@ -258,10 +258,10 @@ int ex(nodeType *p, int s_cnt) {
     // fp = freopen("quads.txt", "a", stdout);
 
     t=0;
-    printf("Quadruples statements %d\n", s_cnt);
+    printf("\nQuadruples for statement: %d\n", s_cnt);
     quad(p);
-    update_table(p);
-    printf("\n");
+    if(update)
+        update_table(p);
     // fclose(fp);
     return 0;
 }

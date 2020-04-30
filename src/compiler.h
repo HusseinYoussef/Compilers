@@ -34,5 +34,3 @@ typedef struct nodeTypeTag {
         oprNodeType opr;         /* operators */
     };
 } nodeType;
-
-extern int sym[26];

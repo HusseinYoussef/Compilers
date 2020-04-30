@@ -94,7 +94,7 @@ char[ ]*\*|string           {
 // }
 
 void yyerror(char *s) {
-    fprintf(stdout, "Line %d: %s\n", yylineno, s);
+    fprintf(stdout, "\nLine %d: %s", yylineno, s);
 }
 
 int yywrap(void) {

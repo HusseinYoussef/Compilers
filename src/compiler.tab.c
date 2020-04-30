@@ -84,13 +84,13 @@ bool chech_type(char* var_name, nodeType* p, typeEnum var_type);
 bool declaration(char* name, typeEnum type, int init);
 void assignment(char* lhs, nodeType* rhs);
 void freeNode(nodeType *p);
-int ex(nodeType *p, int s_cnt);
+int ex(nodeType *p, int s_cnt, int update);
 int yylex(void);
 
 int err = 0;
 int statements = 1;
+int update=0;
 void yyerror(char *s);
-int sym[26];                    /* symbol table */
 node_t *head = NULL;            /* symbol table */
 #include "linked_list.c"
 extern FILE *yyin;
@@ -465,10 +465,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    61,    68,    72,    73,    75,    77,    79,
-      81,    83,    86,    89,    92,    94,    96,    98,   102,   103,
-     107,   115,   123,   131,   139,   141,   143,   144,   145,   146,
-     147
+       0,    57,    57,    61,    69,    73,    74,    76,    78,    80,
+      82,    84,    87,    90,    93,    95,    97,    99,   103,   104,
+     108,   116,   124,   132,   140,   142,   144,   145,   146,   147,
+     148
 };
 #endif
 
@@ -1428,9 +1428,10 @@ yyreduce:
 #line 61 ".\\compiler.y"
     {   
                                     if(err==0)
-                                        ex((yyvsp[(2) - (2)].nPtr), statements);
+                                        ex((yyvsp[(2) - (2)].nPtr), statements, update);
                                     freeNode((yyvsp[(2) - (2)].nPtr));
                                     err=0;
+                                    update=0;
                                     statements++;
                                 ;}
     break;
@@ -1438,112 +1439,112 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 72 ".\\compiler.y"
+#line 73 ".\\compiler.y"
     { (yyval.nPtr) = opr(';', 2, NULL, NULL); ;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 73 ".\\compiler.y"
+#line 74 ".\\compiler.y"
     {(yyval.nPtr) = (yyvsp[(1) - (2)].nPtr);;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 75 ".\\compiler.y"
+#line 76 ".\\compiler.y"
     { declaration((yyvsp[(2) - (3)].var_name), int_val, 0); (yyval.nPtr) = id((yyvsp[(2) - (3)].var_name)); ;}
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 77 ".\\compiler.y"
+#line 78 ".\\compiler.y"
     { declaration((yyvsp[(2) - (3)].var_name), float_val, 0); (yyval.nPtr) = id((yyvsp[(2) - (3)].var_name)); ;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 79 ".\\compiler.y"
+#line 80 ".\\compiler.y"
     { declaration((yyvsp[(2) - (3)].var_name), char_val, 0); (yyval.nPtr) = id((yyvsp[(2) - (3)].var_name)); ;}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 81 ".\\compiler.y"
+#line 82 ".\\compiler.y"
     { declaration((yyvsp[(2) - (3)].var_name), string_val, 0); (yyval.nPtr) = id((yyvsp[(2) - (3)].var_name)); ;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 83 ".\\compiler.y"
-    { (yyval.nPtr) = opr(int_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr));;}
+#line 84 ".\\compiler.y"
+    { (yyval.nPtr) = opr(int_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr)); update=1;;}
     break;
 
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 86 ".\\compiler.y"
-    { (yyval.nPtr) = opr(float_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr));;}
+#line 87 ".\\compiler.y"
+    { (yyval.nPtr) = opr(float_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr)); update=1;;}
     break;
 
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 89 ".\\compiler.y"
-    { (yyval.nPtr) = opr(char_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr));;}
+#line 90 ".\\compiler.y"
+    { (yyval.nPtr) = opr(char_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr)); update=1;;}
     break;
 
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 92 ".\\compiler.y"
-    { (yyval.nPtr) = opr(string_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr));;}
+#line 93 ".\\compiler.y"
+    { (yyval.nPtr) = opr(string_val, '=', 2, id((yyvsp[(2) - (5)].var_name)), (yyvsp[(4) - (5)].nPtr)); update=1;;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 94 ".\\compiler.y"
-    { (yyval.nPtr) = opr(-1, '=', 2, id((yyvsp[(1) - (4)].var_name)), (yyvsp[(3) - (4)].nPtr));;}
+#line 95 ".\\compiler.y"
+    { (yyval.nPtr) = opr(-1, '=', 2, id((yyvsp[(1) - (4)].var_name)), (yyvsp[(3) - (4)].nPtr)); update=1;;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 96 ".\\compiler.y"
+#line 97 ".\\compiler.y"
     { (yyval.nPtr) = (yyvsp[(2) - (3)].nPtr); ;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 98 ".\\compiler.y"
-    { yyerror("ERROR!!!");  err=1; yyerrok; (yyval.nPtr) = NULL;;}
+#line 99 ".\\compiler.y"
+    { err=1; yyerrok; (yyval.nPtr) = NULL; ;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 102 ".\\compiler.y"
+#line 103 ".\\compiler.y"
     { (yyval.nPtr) = (yyvsp[(1) - (1)].nPtr); ;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 103 ".\\compiler.y"
+#line 104 ".\\compiler.y"
     { (yyval.nPtr) = opr(-1, ';', 2, (yyvsp[(1) - (2)].nPtr), (yyvsp[(2) - (2)].nPtr)); ;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 107 ".\\compiler.y"
+#line 108 ".\\compiler.y"
     {
                                     conNodeType *con_ptr;
                                     if ((con_ptr = malloc(sizeof(conNodeType))) == NULL)
@@ -1557,7 +1558,7 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 115 ".\\compiler.y"
+#line 116 ".\\compiler.y"
     { 
                                     conNodeType *con_ptr;
                                     if ((con_ptr = malloc(sizeof(conNodeType))) == NULL)
@@ -1571,7 +1572,7 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 123 ".\\compiler.y"
+#line 124 ".\\compiler.y"
     {
                                     conNodeType *con_ptr;
                                     if ((con_ptr = malloc(sizeof(conNodeType))) == NULL)
@@ -1585,7 +1586,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 131 ".\\compiler.y"
+#line 132 ".\\compiler.y"
     {
                                     conNodeType *con_ptr;
                                     if ((con_ptr = malloc(sizeof(conNodeType))) == NULL)
@@ -1599,56 +1600,56 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 139 ".\\compiler.y"
+#line 140 ".\\compiler.y"
     { (yyval.nPtr) = id((yyvsp[(1) - (1)].var_name)); ;}
     break;
 
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 141 ".\\compiler.y"
+#line 142 ".\\compiler.y"
     { (yyval.nPtr) = opr(-1, UMINUS, 1, (yyvsp[(2) - (2)].nPtr));;}
     break;
 
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 143 ".\\compiler.y"
+#line 144 ".\\compiler.y"
     { (yyval.nPtr) = opr(-1, '+', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); ;}
     break;
 
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 144 ".\\compiler.y"
+#line 145 ".\\compiler.y"
     { (yyval.nPtr) = opr(-1, '-', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); ;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 145 ".\\compiler.y"
+#line 146 ".\\compiler.y"
     { (yyval.nPtr) = opr(-1, '*', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); ;}
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 146 ".\\compiler.y"
+#line 147 ".\\compiler.y"
     { (yyval.nPtr) = opr(-1, '/', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); ;}
     break;
 
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 147 ".\\compiler.y"
+#line 148 ".\\compiler.y"
     { (yyval.nPtr) = (yyvsp[(2) - (3)].nPtr); ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1652 "compiler.tab.c"
+#line 1653 "compiler.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1860,7 +1861,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 150 ".\\compiler.y"
+#line 151 ".\\compiler.y"
 
 
 // REVISED
@@ -1924,15 +1925,17 @@ typeEnum get_operand_type(nodeType* op, int oper)
         
             var = search(op->id.var_name);
             if(var == NULL )
-            {   
-                yyerror("Variable undeclared");
+            {
+                yyerror("");
+                printf("Using undeclared variable with (%c)", oper);
                 err = 1;
                 // return anything
                 return -1;
             }
             else if (var->initial == 0)
             {
-                yyerror("Variable uninitialized");
+                yyerror("");
+                printf("Using uninitialized variable with (%c)", oper);
                 err = 1;
                 // return anything
                 return -1;
@@ -1986,13 +1989,15 @@ nodeType *opr(int rule, int oper, int nops, ...) {
 
             if(operand1_type != operand2_type)
             {
-                yyerror("operation with two type-mismatched operands");
+                yyerror("Operands type mismatch");
+                printf(" with operator (%c) ", oper);
                 err = 1;
             }
             if(operand1_type == char_val || operand1_type == string_val ||
                  operand2_type == char_val || operand2_type == string_val)
             {
-                yyerror("Can't perform this operation on char or string");
+                yyerror("");
+                printf("Can't perform this operation (%c) on char or string", oper);
                 err = 1;
             }
         }
@@ -2008,7 +2013,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
             {
                 if (var != NULL)
                 {
-                    yyerror("Redeclaration error with assignment =\n");
+                    yyerror("Redeclaration error with assignment (=)");
                     err=1;
                     return p;
                 }
@@ -2021,7 +2026,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
             {
                 if (var == NULL)
                 {
-                    yyerror("Undeclared variable with assignment =\n");
+                    yyerror("Undeclared variable with assignment (=)");
                     err=1;
                     return p;
                 }
@@ -2045,7 +2050,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
             // printf("LHS %d RHS %d var \n", LHS_type, RHS_type, var);
             if(RHS_type != -1 && (LHS_type != RHS_type))
             {
-                yyerror("Type mismatch with assignment =\n");
+                yyerror("Type mismatch with assignment (=)");
                 err=1;
             }
             else if(RHS_type != -1 && (LHS_type == RHS_type))
@@ -2063,7 +2068,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
 
         if(operand1_type == char_val || operand1_type == string_val)
         {
-            yyerror("Operand type char or string");
+            yyerror("Can't perform this operation Minus(-) on char or string");
             err = 1;
         }
     }
@@ -2138,8 +2143,7 @@ int main(int argc, char* argv[]) {
     } while (!feof(yyin));
     fclose(yyin);
 
-    printf("\n\nSymbol Table %d\n", err);
+    printf("\n\nSymbol Table\n");
     print_list(head);
-
     return 0;
 }

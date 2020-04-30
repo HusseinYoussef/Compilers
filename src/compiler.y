@@ -13,13 +13,13 @@ bool chech_type(char* var_name, nodeType* p, typeEnum var_type);
 bool declaration(char* name, typeEnum type, int init);
 void assignment(char* lhs, nodeType* rhs);
 void freeNode(nodeType *p);
-int ex(nodeType *p, int s_cnt);
+int ex(nodeType *p, int s_cnt, int update);
 int yylex(void);
 
 int err = 0;
 int statements = 1;
+int update=0;
 void yyerror(char *s);
-int sym[26];                    /* symbol table */
 node_t *head = NULL;            /* symbol table */
 #include "linked_list.c"
 extern FILE *yyin;
@@ -60,9 +60,10 @@ program:
 function:
           function stmt         {   
                                     if(err==0)
-                                        ex($2, statements);
+                                        ex($2, statements, update);
                                     freeNode($2);
                                     err=0;
+                                    update=0;
                                     statements++;
                                 }                                         
         | /* NULL */
@@ -80,22 +81,22 @@ stmt:
         
         | type_string VARIABLE ';'          { declaration($2, string_val, 0); $$ = id($2); }
         
-        | type_int VARIABLE '=' expr ';'    { $$ = opr(int_val, '=', 2, id($2), $4);}
+        | type_int VARIABLE '=' expr ';'    { $$ = opr(int_val, '=', 2, id($2), $4); update=1;}
         
         
-        | type_float VARIABLE '=' expr ';'  { $$ = opr(float_val, '=', 2, id($2), $4);}
+        | type_float VARIABLE '=' expr ';'  { $$ = opr(float_val, '=', 2, id($2), $4); update=1;}
         
         
-        | type_char VARIABLE '=' expr ';'   { $$ = opr(char_val, '=', 2, id($2), $4);}
+        | type_char VARIABLE '=' expr ';'   { $$ = opr(char_val, '=', 2, id($2), $4); update=1;}
         
         
-        | type_string VARIABLE '=' expr ';' { $$ = opr(string_val, '=', 2, id($2), $4);}
+        | type_string VARIABLE '=' expr ';' { $$ = opr(string_val, '=', 2, id($2), $4); update=1;}
 
-        | VARIABLE '=' expr ';'             { $$ = opr(-1, '=', 2, id($1), $3);}
+        | VARIABLE '=' expr ';'             { $$ = opr(-1, '=', 2, id($1), $3); update=1;}
     
         | '{' stmt_list '}'                 { $$ = $2; }
 
-        | error ';'                         { yyerror("ERROR!!!");  err=1; yyerrok; $$ = NULL;}
+        | error ';'                         { err=1; yyerrok; $$ = NULL; }
         ;
 
 stmt_list:
@@ -210,15 +211,17 @@ typeEnum get_operand_type(nodeType* op, int oper)
         
             var = search(op->id.var_name);
             if(var == NULL )
-            {   
-                yyerror("Variable undeclared");
+            {
+                yyerror("");
+                printf("Using undeclared variable with (%c)", oper);
                 err = 1;
                 // return anything
                 return -1;
             }
             else if (var->initial == 0)
             {
-                yyerror("Variable uninitialized");
+                yyerror("");
+                printf("Using uninitialized variable with (%c)", oper);
                 err = 1;
                 // return anything
                 return -1;
@@ -272,13 +275,15 @@ nodeType *opr(int rule, int oper, int nops, ...) {
 
             if(operand1_type != operand2_type)
             {
-                yyerror("operation with two type-mismatched operands");
+                yyerror("Operands type mismatch");
+                printf(" with operator (%c) ", oper);
                 err = 1;
             }
             if(operand1_type == char_val || operand1_type == string_val ||
                  operand2_type == char_val || operand2_type == string_val)
             {
-                yyerror("Can't perform this operation on char or string");
+                yyerror("");
+                printf("Can't perform this operation (%c) on char or string", oper);
                 err = 1;
             }
         }
@@ -294,7 +299,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
             {
                 if (var != NULL)
                 {
-                    yyerror("Redeclaration error with assignment =\n");
+                    yyerror("Redeclaration error with assignment (=)");
                     err=1;
                     return p;
                 }
@@ -307,7 +312,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
             {
                 if (var == NULL)
                 {
-                    yyerror("Undeclared variable with assignment =\n");
+                    yyerror("Undeclared variable with assignment (=)");
                     err=1;
                     return p;
                 }
@@ -331,7 +336,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
             // printf("LHS %d RHS %d var \n", LHS_type, RHS_type, var);
             if(RHS_type != -1 && (LHS_type != RHS_type))
             {
-                yyerror("Type mismatch with assignment =\n");
+                yyerror("Type mismatch with assignment (=)");
                 err=1;
             }
             else if(RHS_type != -1 && (LHS_type == RHS_type))
@@ -349,7 +354,7 @@ nodeType *opr(int rule, int oper, int nops, ...) {
 
         if(operand1_type == char_val || operand1_type == string_val)
         {
-            yyerror("Operand type char or string");
+            yyerror("Can't perform this operation Minus(-) on char or string");
             err = 1;
         }
     }
@@ -424,8 +429,7 @@ int main(int argc, char* argv[]) {
     } while (!feof(yyin));
     fclose(yyin);
 
-    printf("\n\nSymbol Table %d\n", err);
+    printf("\n\nSymbol Table\n");
     print_list(head);
-
     return 0;
 }

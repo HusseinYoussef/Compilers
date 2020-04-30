@@ -52,16 +52,28 @@ void print_list(node_t * head)
         switch (current->type)
         {
         case int_val:
-            printf("%-15s\t\tint\t\t%d\n", current->name, current->iValue);
+            if(current->initial)
+                printf("%-15s\t\tint\t\t%d\n", current->name, current->iValue);
+            else
+                printf("%-15s\t\tint\t\tNULL\n", current->name);
             break;
         case float_val:
-            printf("%-15s\t\tfloat\t\t%f\n", current->name, current->fValue);
+            if(current->initial)
+                printf("%-15s\t\tfloat\t\t%f\n", current->name, current->fValue);
+            else
+                printf("%-15s\t\tint\t\tNULL\n", current->name);
             break;
         case char_val:
-            printf("%-15s\t\tchar\t\t%c\n", current->name, current->cValue);
+            if(current->initial)
+                printf("%-15s\t\tchar\t\t%c\n", current->name, current->cValue);
+            else
+                printf("%-15s\t\tint\t\tNULL\n", current->name);
             break;
         case string_val:
-            printf("%-15s\t\tstring\t\t%s\n", current->name, current->sValue);
+            if(current->initial)
+                printf("%-15s\t\tstring\t\t%s\n", current->name, current->sValue);
+            else
+                printf("%-15s\t\tint\t\tNULL\n", current->name);
             break;
         default:
             break;
